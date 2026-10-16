@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#080d17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>SAITO Control — Free Fire Level Up</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root{
+  --bg-deep:#080d17;
+  --bg-panel:rgba(17,24,39,.72);
+  --bg-panel-2:rgba(10,15,28,.85);
+  --border-soft:rgba(59,130,246,.14);
+  --border-strong:rgba(59,130,246,.45);
+  --accent-primary:#3b82f6;
+  --accent-secondary:#10b981;
+  --accent-highlight:#8b5cf6;
+  --accent-warn:#f59e0b;
+  --accent-danger:#ef4444;
+  --text-primary:#e5eaf3;
+  --text-dim:#94a3b8;
+  --text-faint:#64748b;
+  --glow:0 10px 40px -12px rgba(59,130,246,.35);
+  --safe-b:env(safe-area-inset-bottom, 0px);
+  --safe-t:env(safe-area-inset-top, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  font-family:'Space Grotesk',system-ui,sans-serif;
+  background:#04070d;
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(59,130,246,.10) 0%, transparent 45%),
+    radial-gradient(circle at 80% 100%, rgba(16,185,129,.10) 0%, transparent 45%);
+  color:var(--text-primary);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:rgba(59,130,246,.3);border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ================= PHONE FRAME ================= */
+.phone{
+  position:relative;width:100%;max-width:430px;height:100dvh;
+  background:var(--bg-deep);
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(59,130,246,.13) 0%, transparent 50%),
+    radial-gradient(circle at 100% 90%, rgba(139,92,246,.10) 0%, transparent 50%),
+    linear-gradient(170deg,#080d17 0%,#0c1322 100%);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+@media(min-width:520px){
+  .phone{
+    height:min(880px,95dvh);border-radius:38px;
+    border:1px solid rgba(59,130,246,.20);
+    box-shadow:0 40px 90px -24px rgba(0,0,0,.95), 0 0 0 9px rgba(255,255,255,.025), var(--glow);
+  }
+}
+
+/* ================= APP BAR ================= */
+.appbar{
+  flex-shrink:0;padding:calc(14px + var(--safe-t)) 16px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:rgba(8,13,23,.82);backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  position:relative;z-index:20;
+}
+.appbar::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent-primary),var(--accent-secondary),transparent);
+  opacity:.55;
+}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.logo{
+  width:42px;height:42px;flex-shrink:0;border-radius:13px;
+  background:linear-gradient(135deg,var(--accent-primary),var(--accent-highlight));
+  display:grid;place-items:center;font-size:18px;color:#fff;
+  box-shadow:0 8px 22px -8px rgba(59,130,246,.85);
+}
+.brand h1{
+  font-size:16px;font-weight:700;letter-spacing:-.3px;line-height:1.1;
+  background:linear-gradient(90deg,#f0f4fc,var(--accent-primary));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  white-space:nowrap;
+}
+.brand small{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:1.6px;color:var(--accent-secondary);font-weight:600;margin-top:3px;
+}
+.live-pill{
+  display:inline-flex;align-items:center;gap:5px;flex-shrink:0;
+  background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);
+  color:var(--accent-secondary);padding:5px 10px;border-radius:20px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.6px;
+}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-secondary);
+  box-shadow:0 0 8px var(--accent-secondary);animation:blink 1.4s infinite;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+
+/* ================= SCREENS ================= */
+.screens{flex:1;overflow:hidden;position:relative;}
+.screen{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:16px 16px 26px;display:none;
+  -webkit-overflow-scrolling:touch;
+}
+.screen.active{display:block;animation:fadeUp .28s cubic-bezier(.4,0,.2,1);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.sec-title{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:4px 2px 12px;
+}
+.sec-title h2{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;letter-spacing:-.2px}
+.sec-title span{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--text-faint);letter-spacing:1px}
+
+/* ================= HERO ================= */
+.hero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(59,130,246,.20),rgba(139,92,246,.16));
+  border:1px solid var(--border-soft);border-radius:22px;
+  padding:20px;margin-bottom:16px;backdrop-filter:blur(12px);
+}
+.hero::before{
+  content:'';position:absolute;top:-50px;right:-40px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(59,130,246,.4),transparent 70%);
+}
+.hero-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.hero-top h3{font-size:15px;font-weight:700}
+.hero-top p{font-size:11px;color:var(--text-dim);margin-top:3px}
+.hero-clock{
+  font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;
+  letter-spacing:1px;color:#fff;margin-top:14px;position:relative;z-index:1;
+}
+.hero-clock small{display:block;font-size:9.5px;letter-spacing:1.6px;color:var(--text-dim);
+  font-weight:600;margin-top:4px;text-transform:uppercase}
+.hero-badge{
+  background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.09);
+  padding:5px 10px;border-radius:20px;font-size:10px;font-weight:700;
+  font-family:'JetBrains Mono',monospace;color:#a5b4fc;
+}
+
+/* ================= STATS ================= */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.stat-card{
+  background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:18px;
+  padding:15px;backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:11px;
+  transition:.25s;
+}
+.stat-card:active{transform:scale(.97)}
+.stat-ico{
+  width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:15px;
+}
+.ic-blue{background:rgba(59,130,246,.15);color:var(--accent-primary)}
+.ic-green{background:rgba(16,185,129,.15);color:var(--accent-secondary)}
+.ic-purple{background:rgba(139,92,246,.15);color:var(--accent-highlight)}
+.ic-amber{background:rgba(245,158,11,.15);color:var(--accent-warn)}
+.stat-card h3{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.stat-card p{font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.7px;font-weight:600}
+
+/* ================= QUICK ACTIONS ================= */
+.quick-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.quick{
+  background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:16px;
+  padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;transition:.22s;color:var(--text-dim);
+}
+.quick:active{transform:scale(.95);background:rgba(59,130,246,.12)}
+.quick i{font-size:17px;color:var(--accent-primary)}
+.quick span{font-size:10.5px;font-weight:600;letter-spacing:.2px}
+
+/* ================= MINI LOG ================= */
+.mini-log{
+  background:var(--bg-panel-2);border:1px solid rgba(59,130,246,.10);border-radius:16px;
+  padding:12px 14px;display:flex;flex-direction:column;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;max-height:170px;overflow:hidden;
+}
+.mini-log .row{display:flex;gap:7px;line-height:1.45}
+
+/* ================= ACCOUNT CARDS ================= */
+.search-bar{
+  display:flex;align-items:center;gap:10px;background:var(--bg-panel);
+  border:1px solid var(--border-soft);border-radius:14px;padding:0 14px;margin-bottom:14px;
+}
+.search-bar i{color:var(--text-faint);font-size:13px}
+.search-bar input{
+  flex:1;background:transparent;border:none;outline:none;color:#fff;
+  font-family:'Space Grotesk',sans-serif;font-size:13.5px;padding:12px 0;
+}
+.search-bar input::placeholder{color:var(--text-faint)}
+
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-card{
+  background:var(--bg-panel-2);border:1px solid rgba(255,255,255,.06);
+  border-radius:18px;padding:15px;transition:.25s;animation:fadeUp .3s;
+}
+.acc-card:active{border-color:var(--border-strong)}
+.acc-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+.acc-id{display:flex;align-items:center;gap:11px;min-width:0}
+.acc-avatar{
+  width:42px;height:42px;flex-shrink:0;border-radius:13px;
+  background:linear-gradient(135deg,rgba(59,130,246,.22),rgba(139,92,246,.22));
+  border:1px solid rgba(59,130,246,.3);
+  display:grid;place-items:center;font-family:'JetBrains Mono',monospace;
+  font-weight:700;font-size:16px;color:var(--accent-primary);
+}
+.acc-meta{min-width:0}
+.acc-meta h4{font-size:13.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.region-tag{
+  background:rgba(255,255,255,.07);color:#a5b4fc;padding:2px 6px;border-radius:5px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.5px;flex-shrink:0;
+}
+.acc-meta span{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-faint)}
+.acc-status{
+  display:flex;align-items:center;gap:5px;flex-shrink:0;
+  font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
+  padding:5px 9px;border-radius:20px;letter-spacing:.4px;text-transform:uppercase;
+}
+.st-online{background:rgba(16,185,129,.12);color:var(--accent-secondary);border:1px solid rgba(16,185,129,.28)}
+.st-match{background:rgba(59,130,246,.14);color:var(--accent-primary);border:1px solid rgba(59,130,246,.45);animation:pulseB 1.6s infinite alternate}
+.st-idle{background:rgba(148,163,184,.12);color:var(--text-dim);border:1px solid rgba(148,163,184,.25)}
+.st-error{background:rgba(239,68,68,.12);color:var(--accent-danger);border:1px solid rgba(239,68,68,.32)}
+@keyframes pulseB{0%{border-color:rgba(59,130,246,.3)}100%{border-color:rgba(59,130,246,.9)}}
+
+.exp-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  background:rgba(0,0,0,.32);padding:11px 13px;border-radius:13px;margin-bottom:12px;
+}
+.exp-cell{display:flex;flex-direction:column;gap:3px}
+.exp-lbl{font-size:8.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.exp-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#fff}
+.gain-chip{
+  background:rgba(16,185,129,.16);color:var(--accent-secondary);
+  padding:2px 7px;border-radius:6px;font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:700;display:inline-block;align-self:flex-start;
+}
+.prog-wrap{margin-bottom:12px}
+.prog-lbl{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:600;margin-bottom:6px;letter-spacing:.3px}
+.prog-bg{height:5px;background:rgba(255,255,255,.07);border-radius:10px;overflow:hidden}
+.prog-fill{height:100%;border-radius:10px;transition:width .7s cubic-bezier(.4,0,.2,1);
+  background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));
+  box-shadow:0 0 10px rgba(59,130,246,.5)}
+.acc-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:11px;border-top:1px solid rgba(255,255,255,.05);
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-faint);
+}
+.foot-actions{display:flex;gap:7px}
+.ib{
+  width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+  background:rgba(255,255,255,.05);border:1px solid var(--border-soft);
+  color:var(--text-dim);cursor:pointer;font-size:12px;transition:.2s;
+}
+.ib:active{transform:scale(.9)}
+.ib.danger:active{background:rgba(239,68,68,.18);color:var(--accent-danger)}
+
+/* ================= LOGS ================= */
+.chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:12px;margin-bottom:4px}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex-shrink:0;padding:7px 13px;border-radius:20px;font-size:11px;font-weight:600;
+  background:rgba(255,255,255,.05);border:1px solid var(--border-soft);
+  color:var(--text-dim);cursor:pointer;transition:.2s;
+}
+.chip.on{background:rgba(59,130,246,.18);border-color:var(--border-strong);color:#93c5fd}
+.log-stream{
+  background:#04070f;border:1px solid rgba(59,130,246,.10);border-radius:16px;
+  padding:14px;font-family:'JetBrains Mono',monospace;font-size:10.5px;
+  line-height:1.6;min-height:380px;display:flex;flex-direction:column;gap:5px;
+}
+.log-item{word-break:break-word;animation:fadeUp .2s}
+.log-t{color:#475569;margin-right:6px}
+.log-info{color:#60a5fa}
+.log-success{color:#34d399}
+.log-warning{color:#fbbf24}
+.log-error{color:#f87171}
+
+/* ================= SETTINGS ================= */
+.set-item{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:16px;
+  padding:15px;margin-bottom:10px;
+}
+.set-left{display:flex;align-items:center;gap:12px;min-width:0}
+.set-left i{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;
+  background:rgba(59,130,246,.12);color:var(--accent-primary);font-size:14px;flex-shrink:0}
+.set-left h4{font-size:13px;font-weight:600}
+.set-left p{font-size:10.5px;color:var(--text-faint);margin-top:2px}
+.switch{width:46px;height:26px;border-radius:20px;background:rgba(255,255,255,.10);
+  position:relative;cursor:pointer;transition:.25s;flex-shrink:0;border:none}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;
+  border-radius:50%;background:#94a3b8;transition:.25s}
+.switch.on{background:rgba(16,185,129,.35)}
+.switch.on::after{left:23px;background:var(--accent-secondary);box-shadow:0 0 10px var(--accent-secondary)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 18px;border-radius:13px;font-size:13.5px;font-weight:600;cursor:pointer;
+  border:none;outline:none;font-family:'Space Grotesk',sans-serif;transition:.22s;width:100%;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--accent-primary),var(--accent-highlight));
+  color:#fff;box-shadow:0 8px 22px -8px rgba(59,130,246,.75)}
+.btn-secondary{background:rgba(255,255,255,.05);border:1px solid var(--border-soft);color:var(--text-primary)}
+.btn-danger{background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.32);color:#f87171}
+.about-card{
+  background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:18px;
+  padding:18px;text-align:center;margin-top:6px;
+}
+.about-card .logo{margin:0 auto 12px}
+.about-card h4{font-size:14px;font-weight:700}
+.about-card p{font-size:11px;color:var(--text-faint);margin-top:5px;font-family:'JetBrains Mono',monospace}
+
+/* ================= TAB BAR ================= */
+.tabbar{
+  flex-shrink:0;display:grid;grid-template-columns:repeat(4,1fr);
+  background:rgba(8,13,23,.92);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,.06);
+  padding:9px 6px calc(9px + var(--safe-b));
+  position:relative;z-index:20;
+}
+.tabbar::before{
+  content:'';position:absolute;top:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(59,130,246,.5),transparent);
+}
+.tab{
+  background:none;border:none;cursor:pointer;color:var(--text-faint);
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:6px 0;font-family:'Space Grotesk',sans-serif;transition:.22s;position:relative;
+}
+.tab i{font-size:17px;transition:.22s}
+.tab span{font-size:9.5px;font-weight:600;letter-spacing:.2px}
+.tab.active{color:var(--accent-primary)}
+.tab.active i{transform:translateY(-2px);filter:drop-shadow(0 0 8px rgba(59,130,246,.8))}
+.tab.active::before{
+  content:'';position:absolute;top:-9px;width:26px;height:3px;border-radius:0 0 4px 4px;
+  background:linear-gradient(90deg,var(--accent-primary),var(--accent-highlight));
+  box-shadow:0 0 12px rgba(59,130,246,.9);
+}
+
+/* ================= FAB ================= */
+.fab{
+  position:absolute;right:18px;bottom:calc(84px + var(--safe-b));
+  width:54px;height:54px;border-radius:18px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent-primary),var(--accent-highlight));
+  color:#fff;font-size:21px;display:grid;place-items:center;z-index:30;
+  box-shadow:0 12px 30px -8px rgba(59,130,246,.9);
+  transition:.25s;transform:scale(0);opacity:0;pointer-events:none;
+}
+.fab.show{transform:scale(1);opacity:1;pointer-events:auto}
+.fab:active{transform:scale(.9)}
+
+/* ================= BOTTOM SHEET ================= */
+.sheet-bg{
+  position:absolute;inset:0;background:rgba(4,7,15,.75);backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:.28s;z-index:40;
+}
+.sheet-bg.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:50;
+  background:#0d1424;border-top:1px solid var(--border-strong);
+  border-radius:26px 26px 0 0;padding:12px 20px calc(24px + var(--safe-b));
+  transform:translateY(105%);transition:transform .34s cubic-bezier(.32,.72,0,1);
+  max-height:92%;overflow-y:auto;
+  box-shadow:0 -20px 60px -12px rgba(59,130,246,.35);
+}
+.sheet.on{transform:translateY(0)}
+.sheet-handle{width:42px;height:4px;border-radius:4px;background:rgba(255,255,255,.16);
+  margin:0 auto 16px}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sheet-head h3{font-size:16px;font-weight:700;display:flex;align-items:center;gap:9px;letter-spacing:-.3px}
+.field{margin-bottom:14px}
+.field label{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  color:var(--text-dim);margin-bottom:7px;letter-spacing:.8px;text-transform:uppercase;
+}
+.input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+  border-radius:13px;padding:13px 15px;color:#fff;font-size:14px;outline:none;
+  font-family:'Space Grotesk',sans-serif;transition:.2s;
+}
+.input:focus{border-color:var(--accent-primary);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+select.input{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center}
+textarea.input{resize:none;font-family:'JetBrains Mono',monospace;font-size:12px}
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.type-btn{
+  padding:12px 8px;border-radius:13px;border:1px solid var(--border-soft);
+  background:rgba(255,255,255,.04);color:var(--text-dim);cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;transition:.2s;
+}
+.type-btn.on{background:rgba(59,130,246,.18);border-color:var(--border-strong);color:#93c5fd}
+
+/* ================= TOAST ================= */
+.toast-wrap{
+  position:absolute;top:calc(72px + var(--safe-t));left:16px;right:16px;z-index:60;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none;
+}
+.toast{
+  background:rgba(13,20,36,.96);border:1px solid var(--border-strong);
+  border-left:3px solid var(--accent-primary);border-radius:13px;
+  padding:12px 15px;font-size:12.5px;font-weight:600;color:var(--text-primary);
+  box-shadow:0 14px 34px -10px rgba(0,0,0,.9);
+  animation:toastIn .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:10px;
+}
+.toast.success{border-left-color:var(--accent-secondary)}
+.toast.error{border-left-color:var(--accent-danger)}
+.toast.warn{border-left-color:var(--accent-warn)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+
+/* ================= EMPTY ================= */
+.empty{text-align:center;padding:52px 20px;color:var(--text-faint)}
+.empty i{font-size:42px;margin-bottom:14px;color:rgba(59,130,246,.16);display:block}
+.empty p{font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ============ APP BAR ============ -->
+  <header class="appbar">
+    <div class="brand">
+      <div class="logo"><i class="fa-solid fa-bolt"></i></div>
+      <div>
+        <h1>SAITO Control</h1>
+        <small>FREE FIRE LEVEL UP</small>
+      </div>
+    </div>
+    <span class="live-pill" id="livePill"><span class="live-dot"></span> LIVE</span>
+  </header>
+
+  <!-- ============ SCREENS ============ -->
+  <div class="screens">
+
+    <!-- ---------- HOME ---------- -->
+    <section class="screen active" id="screen-home">
+      <div class="hero">
+        <div class="hero-top">
+          <div>
+            <h3>System Online</h3>
+            <p>SAITO Engine running smoothly</p>
+          </div>
+          <span class="hero-badge" id="modeBadge">DEMO</span>
+        </div>
+        <div class="hero-clock">
+          <span id="uptime">00:00:00</span>
+          <small>System Uptime</small>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-ico ic-blue"><i class="fa-solid fa-users"></i></div>
+          <div>
+            <h3 id="s-acc">0</h3>
+            <p>Active Accounts</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ico ic-green"><i class="fa-solid fa-angles-up"></i></div>
+          <div>
+            <h3 id="s-exp" style="color:var(--accent-secondary)">+0</h3>
+            <p>Total EXP Gained</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ico ic-purple"><i class="fa-solid fa-gamepad"></i></div>
+          <div>
+            <h3 id="s-match">0</h3>
+            <p>Matches Done</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-ico ic-amber"><i class="fa-solid fa-shield-halved"></i></div>
+          <div>
+            <h3 id="s-rate">0%</h3>
+            <p>Success Rate</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-title">
+        <h2><i class="fa-solid fa-bolt" style="color:var(--accent-warn)"></i> Quick Actions</h2>
+      </div>
+      <div class="quick-row">
+        <button class="quick" onclick="openSheet()">
+          <i class="fa-solid fa-plus"></i><span>Add ID</span>
+        </button>
+        <button class="quick" onclick="refreshAll()">
+          <i class="fa-solid fa-rotate"></i><span>Refresh</span>
+        </button>
+        <button class="quick" onclick="clearLogs()">
+          <i class="fa-solid fa-broom"></i><span>Clear Log</span>
+        </button>
+      </div>
+
+      <div class="sec-title">
+        <h2><i class="fa-solid fa-wave-square" style="color:var(--accent-secondary)"></i> Recent Activity</h2>
+        <span id="miniCount">0 EVENTS</span>
+      </div>
+      <div class="mini-log" id="miniLog"></div>
+    </section>
+
+    <!-- ---------- ACCOUNTS ---------- -->
+    <section class="screen" id="screen-accounts">
+      <div class="sec-title">
+        <h2><i class="fa-solid fa-user-astronaut" style="color:var(--accent-primary)"></i> Live Accounts</h2>
+        <span id="accCount">0 ID</span>
+      </div>
+
+      <div class="search-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search UID or nickname...">
+      </div>
+
+      <div class="acc-list" id="accList"></div>
+    </section>
+
+    <!-- ---------- LOGS ---------- -->
+    <section class="screen" id="screen-logs">
+      <div class="sec-title">
+        <h2><i class="fa-solid fa-terminal" style="color:var(--accent-secondary)"></i> System Logs</h2>
+        <span id="logCount">0</span>
+      </div>
+
+      <div class="chips" id="logChips">
+        <button class="chip on" data-f="all">All</button>
+        <button class="chip" data-f="info">Info</button>
+        <button class="chip" data-f="success">Success</button>
+        <button class="chip" data-f="warning">Warning</button>
+        <button class="chip" data-f="error">Error</button>
+      </div>
+
+      <div class="log-stream" id="logStream"></div>
+    </section>
+
+    <!-- ---------- SETTINGS ---------- -->
+    <section class="screen" id="screen-settings">
+      <div class="sec-title">
+        <h2><i class="fa-solid fa-sliders" style="color:var(--accent-highlight)"></i> Settings</h2>
+      </div>
+
+      <div class="set-item">
+        <div class="set-left">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <div>
+            <h4>Demo Engine</h4>
+            <p>Local EXP simulation (no backend)</p>
+          </div>
+        </div>
+        <button class="switch on" id="swDemo" onclick="toggleSwitch(this)"></button>
+      </div>
+
+      <div class="set-item">
+        <div class="set-left">
+          <i class="fa-solid fa-bell"></i>
+          <div>
+            <h4>Notifications</h4>
+            <p>Toast alerts on EXP gain</p>
+          </div>
+        </div>
+        <button class="switch on" id="swNotif" onclick="toggleSwitch(this)"></button>
+      </div>
+
+      <div class="set-item">
+        <div class="set-left">
+          <i class="fa-solid fa-gauge-high"></i>
+          <div>
+            <h4>Fast Mode</h4>
+            <p>Faster match simulation</p>
+          </div>
+        </div>
+        <button class="switch" id="swFast" onclick="toggleSwitch(this)"></button>
+      </div>
+
+      <div style="height:8px"></div>
+
+      <button class="btn btn-secondary" style="margin-bottom:10px" onclick="refreshAll()">
+        <i class="fa-solid fa-rotate"></i> Refresh All Accounts
+      </button>
+      <button class="btn btn-secondary" style="margin-bottom:10px" onclick="clearLogs()">
+        <i class="fa-solid fa-broom"></i> Clear System Logs
+      </button>
+      <button class="btn btn-danger" onclick="resetAll()">
+        <i class="fa-solid fa-triangle-exclamation"></i> Reset All Data
+      </button>
+
+      <div class="about-card">
+        <div class="logo"><i class="fa-solid fa-bolt"></i></div>
+        <h4>SAITO Control Panel</h4>
+        <p>v2.0 • MOBILE EDITION</p>
+        <p style="margin-top:8px;color:var(--accent-secondary)">Powered by SAITO COMMUNITY</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ FAB ============ -->
+  <button class="fab" id="fab" onclick="openSheet()"><i class="fa-solid fa-plus"></i></button>
+
+  <!-- ============ TAB BAR ============ -->
+  <nav class="tabbar">
+    <button class="tab active" data-screen="home">
+      <i class="fa-solid fa-house"></i><span>Home</span>
+    </button>
+    <button class="tab" data-screen="accounts">
+      <i class="fa-solid fa-user-astronaut"></i><span>Accounts</span>
+    </button>
+    <button class="tab" data-screen="logs">
+      <i class="fa-solid fa-terminal"></i><span>Logs</span>
+    </button>
+    <button class="tab" data-screen="settings">
+      <i class="fa-solid fa-sliders"></i><span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- ============ BOTTOM SHEET ============ -->
+  <div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3><i class="fa-solid fa-user-plus" style="color:var(--accent-primary)"></i> Add Account</h3>
+      <button class="ib" onclick="closeSheet()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="type-toggle">
+      <button type="button" class="type-btn on" id="tbGuest" onclick="setType('guest')">Guest ID</button>
+      <button type="button" class="type-btn" id="tbToken" onclick="setType('token')">Access Token</button>
+    </div>
+
+    <form id="addForm" onsubmit="submitAdd(event)">
+      <div id="guestFields">
+        <div class="field">
+          <label>Guest UID</label>
+          <input type="text" class="input" id="inUid" placeholder="e.g. 7644913583" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label>Guest Password</label>
+          <input type="text" class="input" id="inPass" placeholder="e.g. ZERO_GRAVITY_4NM38">
+        </div>
+      </div>
+
+      <div id="tokenFields" style="display:none">
+        <div class="field">
+          <label>Access Token</label>
+          <textarea class="input" id="inTok" rows="3" placeholder="Paste token here..."></textarea>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Nickname (optional)</label>
+        <input type="text" class="input" id="inNick" placeholder="Auto generated if empty">
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button type="button" class="btn btn-secondary" onclick="closeSheet()">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Save &amp; Start</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ============ TOASTS ============ -->
+  <div class="toast-wrap" id="toastWrap"></div>
+</div>
+
+<script>
+/* =========================================================
+   SAITO CONTROL — MOBILE EDITION
+   Works standalone (local demo engine) + auto-detects backend
+   ========================================================= */
+
+const LS_KEY   = 'saito_ff_control_mobile_v2';
+const REGIONS  = ['BD','IN','PK','SG','ID','MY','TH','PH'];
+const NICKS    = ['ZeroGravity','PhantomX','NinjaOP','AlokGod','SkylerPro','HydraKing','ViperYT','GhostRider','TitanBoss'];
+
+let API_MODE   = false;      // true = real backend detected
+let demoEngine = true;
+let notifOn    = true;
+let fastMode   = false;
+let currentTab = 'home';
+let logFilter  = 'all';
+let searchQ    = '';
+let addType    = 'guest';
+let bootTime   = Date.now();
+let tickTimer  = null;
+
+/* ---------------- STATE ---------------- */
+let state = {
+  accounts: [],
+  logs: [],
+  totalMatches: 0,
+  totalExp: 0
+};
+
+/* ---------------- HELPERS ---------------- */
+const $  = id => document.getElementById(id);
+const nowTime = () => new Date().toLocaleTimeString('en-GB', { hour12:false });
+const rand  = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick  = arr => arr[Math.floor(Math.random()*arr.length)];
+const esc   = t => String(t==null?'':t)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const num   = n => Number(n||0).toLocaleString('en-US');
+
+function fmtUptime(sec){
+  const h = String(Math.floor(sec/3600)).padStart(2,'0');
+  const m = String(Math.floor((sec%3600)/60)).padStart(2,'0');
+  const s = String(Math.floor(sec%60)).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+
+/* ---------------- PERSISTENCE ---------------- */
+function save(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      accounts: state.accounts,
+      logs: state.logs.slice(-120),
+      totalMatches: state.totalMatches,
+      totalExp: state.totalExp
+    }));
+  }catch(e){}
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    state.accounts     = d.accounts || [];
+    state.logs         = d.logs || [];
+    state.totalMatches = d.totalMatches || 0;
+    state.totalExp     = d.totalExp || 0;
+    return state.accounts.length > 0;
+  }catch(e){ return false; }
+}
+
+/* ---------------- TOAST ---------------- */
+function toast(msg, type='info'){
+  if(!notifOn && type !== 'error') return;
+  const icons = { info:'fa-circle-info', success:'fa-circle-check', error:'fa-circle-xmark', warn:'fa-triangle-exclamation' };
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.innerHTML = `<i class="fa-solid ${icons[type]||icons.info}"></i><span>${esc(msg)}</span>`;
+  $('toastWrap').appendChild(el);
+  setTimeout(() => {
+    el.style.transition = '.3s'; el.style.opacity = '0'; el.style.transform = 'translateY(-12px)';
+    setTimeout(() => el.remove(), 320);
+  }, 2600);
+}
+
+/* ---------------- LOGS ---------------- */
+function addLog(level, message){
+  state.logs.push({ time: nowTime(), level, message });
+  if(state.logs.length > 220) state.logs.splice(0, state.logs.length - 220);
+  if(currentTab === 'logs') renderLogs();
+}
+
+/* =========================================================
+   DEMO ENGINE (local simulation)
+   ========================================================= */
+function createAccount(data){
+  const uid = data.uid || String(rand(100000000, 999999999));
+  const acc = {
+    uid,
+    nickname: data.nickname || pick(NICKS) + rand(10,99),
+    region: pick(REGIONS),
+    level: rand(18, 62),
+    initial_exp: rand(5000, 42000),
+    current_exp: 0,
+    gained_exp: 0,
+    matches_played: 0,
+    active_matches: 0,
+    status: 'ONLINE',
+    last_match_time: 'waiting...',
+    type: data.type || 'guest'
+  };
+  acc.current_exp = acc.initial_exp;
+  return acc;
+}
+
+function engineTick(){
+  if(!demoEngine || API_MODE) return;
+
+  state.accounts.forEach(a => {
+    if(a.status === 'ERROR') return;
+
+    const chance = fastMode ? 0.75 : 0.38;
+
+    if(a.status === 'ONLINE' && Math.random() < chance){
+      a.status = 'IN_MATCH';
+      a.active_matches = 1;
+      addLog('info', `[${a.nickname}] Match started on ${a.region} server`);
+    }
+    else if(a.status === 'IN_MATCH'){
+      const gain = rand(90, 340);
+      a.current_exp   += gain;
+      a.gained_exp    += gain;
+      a.matches_played += 1;
+      state.totalMatches += 1;
+      state.totalExp     += gain;
+      a.level = Math.floor(a.current_exp / 1000) + 1;
+      a.last_match_time = nowTime();
+
+      addLog('success', `[${a.nickname}] +${gain} EXP gained (Match #${a.matches_played})`);
+
+      // Random event
+      const r = Math.random();
+      if(r < 0.06){
+        a.status = 'ERROR';
+        a.active_matches = 0;
+        addLog('error', `[${a.nickname}] Session expired — retrying...`);
+        setTimeout(() => {
+          a.status = 'ONLINE';
+          addLog('warning', `[${a.nickname}] Reconnected successfully`);
+          renderCurrent();
+        }, 6000);
+      } else if(r < 0.25){
+        a.status = 'ONLINE';
+        a.active_matches = 0;
+      } else {
+        a.status = 'IN_MATCH';
+        a.active_matches = 1;
+      }
+    }
+    else if(a.status === 'OFFLINE'){
+      if(Math.random() < 0.4){
+        a.status = 'ONLINE';
+        addLog('info', `[${a.nickname}] Back online`);
+      }
+    }
+  });
+
+  save();
+  renderCurrent();
+}
+
+/* =========================================================
+   RENDERING
+   ========================================================= */
+function renderCurrent(){
+  if(currentTab === 'home')     renderHome();
+  if(currentTab === 'accounts') renderAccounts();
+  if(currentTab === 'logs')     renderLogs();
+}
+
+/* -------- HOME -------- */
+function renderHome(){
+  const active = state.accounts.length;
+  const exp    = state.totalExp;
+  const match  = state.totalMatches;
+  const rate   = active === 0 ? 0 : Math.min(99, 82 + (active % 17));
+
+  $('s-acc').textContent   = active;
+  $('s-exp').textContent   = '+' + num(exp);
+  $('s-match').textContent = num(match);
+  $('s-rate').textContent  = rate + '%';
+
+  const recent = state.logs.slice(-5).reverse();
+  const mini = $('miniLog');
+  $('miniCount').textContent = state.logs.length + ' EVENTS';
+
+  if(recent.length === 0){
+    mini.innerHTML = `<div class="row" style="color:var(--text-faint)">No activity yet — add an account to start.</div>`;
+  } else {
+    mini.innerHTML = recent.map(l =>
+      `<div class="row"><span class="log-t">[${l.time}]</span><span class="log-${l.level}">${esc(l.message)}</span></div>`
+    ).join('');
+  }
+}
+
+/* -------- ACCOUNTS -------- */
+function statusMeta(st){
+  if(st === 'IN_MATCH') return { cls:'st-match',  txt:'IN MATCH' };
+  if(st === 'ERROR')    return { cls:'st-error',  txt:'ERROR'    };
+  if(st === 'OFFLINE')  return { cls:'st-idle',   txt:'OFFLINE'  };
+  if(st === 'CONNECTING') return { cls:'st-idle', txt:'CONNECT'  };
+  return { cls:'st-online', txt:'ONLINE' };
+}
+
+function renderAccounts(){
+  const list = $('accList');
+  const q = searchQ.toLowerCase().trim();
+
+  let items = state.accounts;
+  if(q) items = items.filter(a =>
+    String(a.uid).toLowerCase().includes(q) ||
+    String(a.nickname||'').toLowerCase().includes(q)
+  );
+
+  $('accCount').textContent = state.accounts.length + ' ID';
+
+  if(items.length === 0){
+    list.innerHTML = `<div class="empty">
+      <i class="fa-solid fa-ghost"></i>
+      <p>${state.accounts.length === 0
+        ? 'No accounts loaded.<br>Tap the + button to begin.'
+        : 'No account matches your search.'}</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(a => {
+    const m = statusMeta(a.status);
+    const progress = Math.min(100, Math.max(6, ((a.current_exp % 1000) / 10)));
+    return `
+    <div class="acc-card">
+      <div class="acc-top">
+        <div class="acc-id">
+          <div class="acc-avatar">${esc((a.nickname||'P').charAt(0).toUpperCase())}</div>
+          <div class="acc-meta">
+            <h4>${esc(a.nickname)} <span class="region-tag">${esc(a.region)}</span></h4>
+            <span>UID: ${esc(a.uid)}</span>
+          </div>
+        </div>
+        <div class="acc-status ${m.cls}">${m.txt}</div>
+      </div>
+
+      <div class="exp-row">
+        <div class="exp-cell">
+          <span class="exp-lbl">Initial</span>
+          <span class="exp-val">${num(a.initial_exp)}</span>
+        </div>
+        <div class="exp-cell">
+          <span class="exp-lbl">Current</span>
+          <span class="exp-val">${num(a.current_exp)}</span>
+        </div>
+        <div class="exp-cell">
+          <span class="exp-lbl">Gained</span>
+          <span class="gain-chip">+${num(a.gained_exp)}</span>
+        </div>
+      </div>
+
+      <div class="prog-wrap">
+        <div class="prog-lbl">
+          <span style="color:var(--accent-primary)">LV ${a.level}</span>
+          <span style="color:var(--text-faint)">Matches: ${a.matches_played}</span>
+        </div>
+        <div class="prog-bg">
+          <div class="prog-fill" style="width:${progress}%"></div>
+        </div>
+      </div>
+
+      <div class="acc-foot">
+        <span>Last: ${esc(a.last_match_time)}</span>
+        <div class="foot-actions">
+          <button class="ib" onclick="refreshAcc('${esc(a.uid)}')"><i class="fa-solid fa-rotate"></i></button>
+          <button class="ib danger" onclick="delAcc('${esc(a.uid)}')"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* -------- LOGS -------- */
+function renderLogs(){
+  const stream = $('logStream');
+  let items = state.logs;
+  if(logFilter !== 'all') items = items.filter(l => l.level === logFilter);
+
+  $('logCount').textContent = items.length;
+
+  if(items.length === 0){
+    stream.innerHTML = `<div class="empty" style="padding:30px 10px">
+      <i class="fa-solid fa-terminal"></i><p>No logs to display</p>
+    </div>`;
+    return;
+  }
+
+  stream.innerHTML = items.slice(-150).map(l =>
+    `<div class="log-item"><span class="log-t">[${l.time}]</span><span class="log-${l.level}">${esc(l.message)}</span></div>`
+  ).join('');
+
+  stream.scrollTop = stream.scrollHeight;
+}
+
+/* =========================================================
+   TAB NAVIGATION
+   ========================================================= */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.screen;
+    currentTab = target;
+
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $('screen-' + target).classList.add('active');
+
+    // FAB only on accounts screen
+    $('fab').classList.toggle('show', target === 'accounts');
+
+    renderCurrent();
+  });
+});
+
+/* =========================================================
+   BOTTOM SHEET
+   ========================================================= */
+function openSheet(){
+  $('sheetBg').classList.add('on');
+  $('sheet').classList.add('on');
+}
+function closeSheet(){
+  $('sheetBg').classList.remove('on');
+  $('sheet').classList.remove('on');
+}
+function setType(t){
+  addType = t;
+  $('tbGuest').classList.toggle('on', t === 'guest');
+  $('tbToken').classList.toggle('on', t === 'token');
+  $('guestFields').style.display = t === 'guest' ? 'block' : 'none';
+  $('tokenFields').style.display = t === 'token' ? 'block' : 'none';
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+async function submitAdd(e){
+  e.preventDefault();
+
+  const nickname = $('inNick').value.trim();
+  let payload;
+
+  if(addType === 'guest'){
+    const uid  = $('inUid').value.trim();
+    const pass = $('inPass').value.trim();
+    if(!uid || !pass){ toast('UID and Password required', 'error'); return; }
+    if(state.accounts.some(a => a.uid === uid)){ toast('This UID already exists', 'warn'); return; }
+    payload = { uid, password: pass, nickname, type: 'guest' };
+  } else {
+    const token = $('inTok').value.trim();
+    if(!token){ toast('Access token required', 'error'); return; }
+    payload = { token, nickname, type: 'token' };
+  }
+
+  // Try real backend first
+  if(API_MODE){
+    try{
+      const r = await fetch('/api/account/add', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const d = await r.json();
+      if(d.status === 'ok'){
+        toast('Account added to backend', 'success');
+        closeSheet();
+        $('addForm').reset();
+        fetchFromAPI();
+        return;
+      }
+      toast('Backend error: ' + (d.error || 'unknown'), 'error');
+      return;
+    }catch(err){
+      toast('Backend unreachable — using demo mode', 'warn');
+      API_MODE = false;
+    }
+  }
+
+  // Local demo add
+  const acc = createAccount(payload);
+  state.accounts.unshift(acc);
+  addLog('success', `Account ${acc.nickname} (${acc.uid}) added successfully`);
+  save();
+  renderCurrent();
+
+  closeSheet();
+  $('addForm').reset();
+  setType('guest');
+  toast(`${acc.nickname} added successfully`, 'success');
+
+  // Switch to accounts tab
+  document.querySelector('.tab[data-screen="accounts"]').click();
+}
+
+async function delAcc(uid){
+  const acc = state.accounts.find(a => String(a.uid) === String(uid));
+  if(!acc) return;
+  if(!confirm(`Remove ${acc.nickname} (${uid})?`)) return;
+
+  if(API_MODE){
+    try{
+      await fetch('/api/account/delete', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ uid })
+      });
+      fetchFromAPI();
+      return;
+    }catch(e){ API_MODE = false; }
+  }
+
+  state.accounts = state.accounts.filter(a => String(a.uid) !== String(uid));
+  addLog('warning', `Account ${acc.nickname} removed from system`);
+  save();
+  renderCurrent();
+  toast('Account removed', 'warn');
+}
+
+async function refreshAcc(uid){
+  const acc = state.accounts.find(a => String(a.uid) === String(uid));
+  if(!acc) return;
+
+  if(API_MODE){
+    try{
+      await fetch('/api/account/refresh', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ uid })
+      });
+      fetchFromAPI();
+      return;
+    }catch(e){ API_MODE = false; }
+  }
+
+  acc.status = 'CONNECTING';
+  renderCurrent();
+
+  setTimeout(() => {
+    acc.status = 'ONLINE';
+    const bonus = rand(20, 90);
+    acc.current_exp += bonus;
+    acc.gained_exp  += bonus;
+    state.totalExp  += bonus;
+    acc.level = Math.floor(acc.current_exp / 1000) + 1;
+    addLog('info', `[${acc.nickname}] Session refreshed (+${bonus} EXP)`);
+    save();
+    renderCurrent();
+  }, 900);
+
+  toast('Refreshing session...', 'info');
+}
+
+function refreshAll(){
+  if(state.accounts.length === 0){ toast('No accounts to refresh', 'warn'); return; }
+  state.accounts.forEach(a => { if(a.status !== 'ERROR') a.status = 'CONNECTING'; });
+  renderCurrent();
+  toast('Refreshing all sessions...', 'info');
+
+  setTimeout(() => {
+    state.accounts.forEach(a => { if(a.status === 'CONNECTING') a.status = 'ONLINE'; });
+    addLog('success', `All ${state.accounts.length} sessions refreshed`);
+    save();
+    renderCurrent();
+    toast('All accounts refreshed', 'success');
+  }, 1100);
+}
+
+function clearLogs(){
+  state.logs = [];
+  save();
+  renderCurrent();
+  toast('System logs cleared', 'warn');
+}
+
+function resetAll(){
+  if(!confirm('Delete ALL accounts and logs? This cannot be undone.')) return;
+  state = { accounts: [], logs: [], totalMatches: 0, totalExp: 0 };
+  localStorage.removeItem(LS_KEY);
+  renderCurrent();
+  toast('All data reset', 'error');
+}
+
+/* =========================================================
+   SETTINGS TOGGLES
+   ========================================================= */
+function toggleSwitch(el){
+  el.classList.toggle('on');
+  const on = el.classList.contains('on');
+
+  if(el.id === 'swDemo'){
+    demoEngine = on;
+    addLog('info', 'Demo engine ' + (on ? 'enabled' : 'disabled'));
+  }
+  if(el.id === 'swNotif') notifOn = on;
+  if(el.id === 'swFast'){
+    fastMode = on;
+    restartTick();
+    addLog('info', 'Fast mode ' + (on ? 'enabled' : 'disabled'));
+  }
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+$('searchInput').addEventListener('input', e => {
+  searchQ = e.target.value;
+  renderAccounts();
+});
+
+/* =========================================================
+   LOG FILTER CHIPS
+   ========================================================= */
+document.querySelectorAll('#logChips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#logChips .chip').forEach(c => c.classList.remove('on'));
+    chip.classList.add('on');
+    logFilter = chip.dataset.f;
+    renderLogs();
+  });
+});
+
+/* =========================================================
+   UPTIME CLOCK
+   ========================================================= */
+setInterval(() => {
+  $('uptime').textContent = fmtUptime(Math.floor((Date.now() - bootTime) / 1000));
+}, 1000);
+
+/* =========================================================
+   ENGINE TIMER
+   ========================================================= */
+function restartTick(){
+  clearInterval(tickTimer);
+  const interval = fastMode ? 2000 : 4200;
+  tickTimer = setInterval(engineTick, interval);
+}
+
+/* =========================================================
+   OPTIONAL BACKEND DETECTION
+   ========================================================= */
+async function detectAPI(){
+  try{
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 1800);
+    const r = await fetch('/api/stats', { signal: ctrl.signal });
+    clearTimeout(t);
+    if(r.ok){
+      const d = await r.json();
+      if(d && typeof d === 'object'){
+        API_MODE = true;
+        $('modeBadge').textContent = 'LIVE API';
+        $('modeBadge').style.color = 'var(--accent-secondary)';
+        addLog('success', 'Backend connected — live API mode active');
+        applyAPIStats(d);
+        return true;
+      }
+    }
+  }catch(e){ /* no backend — demo mode */ }
+  return false;
+}
+
+function applyAPIStats(d){
+  state.totalMatches = d.total_matches || 0;
+  state.totalExp     = d.total_gained_exp || 0;
+
+  if(Array.isArray(d.accounts)){
+    state.accounts = d.accounts.map(a => ({
+      uid: a.uid,
+      nickname: a.nickname || 'Player',
+      region: a.region || 'BD',
+      level: a.level || 1,
+      initial_exp: a.initial_exp || 0,
+      current_exp: a.current_exp || 0,
+      gained_exp: a.gained_exp || 0,
+      matches_played: a.matches_played || 0,
+      active_matches: a.active_matches || 0,
+      status: a.status || 'ONLINE',
+      last_match_time: a.last_match_time || 'running...'
+    }));
+  }
+
+  if(Array.isArray(d.logs)){
+    state.logs = d.logs.map(l => ({
+      time: l.time || nowTime(),
+      level: l.level || 'info',
+      message: l.message || ''
+    }));
+  }
+
+  renderCurrent();
+}
+
+async function fetchFromAPI(){
+  if(!API_MODE) return;
+  try{
+    const r = await fetch('/api/stats');
+    const d = await r.json();
+    applyAPIStats(d);
+  }catch(e){
+    API_MODE = false;
+    $('modeBadge').textContent = 'DEMO';
+    $('modeBadge').style.color = '#a5b4fc';
+  }
+}
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+async function boot(){
+  const hasLocal = load();
+
+  if(hasLocal){
+    addLog('info', 'Session restored from local storage');
+  } else {
+    // First run — seed with 2 sample accounts so UI isn't empty
+    state.accounts = [
+      createAccount({ uid:'7644913583', nickname:'ZeroGravity', type:'guest' }),
+      createAccount({ uid:'8123947650', nickname:'PhantomX',    type:'guest' })
+    ];
+    state.accounts[0].region = 'BD';
+    state.accounts[1].region = 'IN';
+
+    addLog('success', 'SAITO Engine initialized successfully');
+    addLog('info', '2 demo accounts loaded — replace with your own');
+    addLog('info', 'Demo engine active (no backend detected)');
+    save();
+  }
+
+  $('modeBadge').textContent = 'DEMO';
+
+  const apiOk = await detectAPI();
+  if(!apiOk){
+    addLog('warning', 'Backend not found — running in local demo mode');
+  }
+
+  renderCurrent();
+  restartTick();
+
+  // API polling if live
+  setInterval(() => { if(API_MODE) fetchFromAPI(); }, 3000);
+
+  // Save periodically
+  setInterval(save, 8000);
+
+  setTimeout(() => toast('Welcome to SAITO Control Panel', 'success'), 500);
+}
+
+boot();
+</script>
+</body>
+</html>
